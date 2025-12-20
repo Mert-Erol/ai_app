@@ -8,6 +8,11 @@
     />
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"> </script>
+
+
   </head>
   <style>
     .arkaplan {
@@ -88,5 +93,12 @@
         .attr("src", URL.createObjectURL(file))
         .removeClass("d-none");
     });
+
+    var model;
+    $(document).ready(async function() {
+            $('#loading').text('Model yükleniyor, lütfen bekleyin...');
+            model = await mobilenet.load();
+            $('#loading').text('Model yüklendi. Lütfen bir görsel seçin.');
+        });
   </script>
 </html>
