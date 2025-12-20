@@ -8,75 +8,95 @@
         
 
         <style>
-        body {
-            background: #b4aab6;
-            font-family: Arial, sans-serif;
-            padding: 40px;
-        }
+    /* Arka plan */
+.arkaplan {
+  background: #b4aab6;
+  font-family: Arial, sans-serif;
+  padding: 40px;
+}
 
-        .card {
-            max-width: 500px;
-            margin: auto;
-            background: rgb(61, 57, 61);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            color: white;
-        }
 
-        textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            resize: vertical;
-        }
+.card {
+  max-width: 500px;
+  margin: auto;
+  background: rgb(61, 57, 61);
+  padding: 25px;
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
 
-        button {
-            width: 100%;
-            margin-top: 15px;
-            padding: 10px;
-            background: #ccc3d0;
-            color: rgb(0, 0, 0);
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
+.gorsel {
+  margin-top: 15px;
+  border-radius: 8px;
+}
 
-        button:hover {
-            background: #cca9ea;
-        }
+/* Button */
+.btn {
+  margin-top: 15px;
+  padding: 10px;
+  background: #ccc3d0;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 6px;
+}
 
-        #loading {
-            text-align: center;
-            color: #777;
-            margin-top: 10px;
-            font-size: 0.9em;
-        }
+.btn:hover {
+  background: #cca9ea;
+}
 
-        #result {
-            margin-top: 15px;
-            font-size: 1.1em;
-            font-weight: bold;
-            text-align: center;
-        }
+/* Loading */
+#loading {
+  color: #777;
+  font-size: 0.9em;
+}
+
+/* Result */
+#result {
+  font-size: 1.1em;
+}
+
     </style>
-    <body>
+    <body class="arkaplan">
         
-        <div class="card">
-        <h3 style="text-align:center;">TensorFlow.js ile Metin Analizi</h3>
+        <div class="container mt-5">
+    <div class="card custom-card">
 
-        <textarea id="inputText" placeholder="Analiz edilecek metni giriniz"></textarea>
+      <h3 class="text-center mb-3">
+        TensorFlow.js ile Görüntü İşleme
+      </h3>
 
-        <button id="predictBtn">Analiz Et</button>
+      <input type="file" id="imageUpload"
+             class="form-control mb-3"
+             accept="image/*">
 
-        <div id="loading">Model yükleniyor, lütfen bekleyin...</div>
+      <img id="preview" class="img-fluid preview-img d-none">
 
-        <div id="result"></div>
+      <button id="predictBtn" class="btn custom-btn w-100">
+        Analiz Et
+      </button>
+
+      <div id="loading" class="text-center mt-2">
+        Model yükleniyor, lütfen bekleyin...
+      </div>
+
+      <div id="result" class="text-center mt-3 fw-bold"></div>
+
+    </div>
+  </div>
         
     </body>
+<script>
+$("#imageUpload").on("change", function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  $("#preview")
+    .attr("src", URL.createObjectURL(file))
+    .removeClass("d-none");
+});
+</script>
+
    
 
 </html>
