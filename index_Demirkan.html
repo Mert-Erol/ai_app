@@ -1,103 +1,89 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <title>Dil Algılama</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Dil Algılama</title>
 
-    <style>
-        body {
-            min-height: 100vh;
-            background-image: url(background.jpg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
 
-        .card {
-            border-radius: 8px;
-            border: none;
-        }
-        .card:hover {
-            border-radius: 18px;
-            transform: translateY(-1px);
-            box-shadow: 0 50px 50px rgba(15, 216, 163, 0.15);
-            transition: 0.5s;
-        }
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-        .card-title {
-            font-weight: 600;
-        }
-        textarea {
-            resize: none;
-        }
+<style>
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FFFBDE, #91C8E4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-        .btn-detect {
-            background: linear-gradient(135deg, #4682A9, #749BC2);
-            border: none;
-            transition: transform .2s ease, box-shadow .2s ease;
-        }
+.card {
+  border-radius: 12px;
+  transition: .3s;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 30px 40px rgba(0,0,0,.15);
+}
 
-        .btn-detect:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 20px rgba(0,0,0,.15);
-        }
+textarea { resize: none; }
 
-        .result-box {
-            border-radius: 12px;
-            background: #f8f9fa;
-            animation: fadeIn .4s ease-in-out;
-        }
-    </style>
+.btn-detect {
+  background: linear-gradient(135deg, #4682A9, #749BC2);
+  border: none;
+}
+
+.result-box {
+  border-radius: 10px;
+  background: #f8f9fa;
+  animation: fadeIn .3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
+<div class="row justify-content-center">
+<div class="col-md-6 col-lg-5">
 
-            <div class="card shadow-lg">
-                <div class="card-body p-4">
+<div class="card p-4 shadow-lg">
 
-                    <h4 class="card-title text-center mb-1">
-                        🌍 Dil Algılama
-                    </h4>
-                    <p class="text-muted text-center mb-4">
-                        Metni gir, dilini saniyeler içinde öğren
-                    </p>
+<h4 class="text-center mb-1">🌍 Dil Algılama</h4>
+<p class="text-muted text-center mb-3">Metni yaz, dili ve bayrağı öğren</p>
 
-               
-                    <div class="mb-3">
-                        <textarea id="textInput" class="form-control form-control-lg"
-                                  rows="4" placeholder="Örnek: Hello, how are you?"></textarea>
-                    </div>
+<textarea id="textInput" class="form-control mb-3" rows="3"
+placeholder="Örnek: merhaba dünya"></textarea>
 
-                  
-                    <button id="detectBtn" class="btn btn-detect text-white w-100 py-2"
-                            onclick="detectLanguage()">
-                        Algıla
-                        <span id="loadingSpinner" class="d-none">
-                            <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
-                        </span>
-                    </button>
+<button class="btn btn-detect text-white w-100"
+onclick="detectLanguage()">
+Algıla
+<span id="spinner" class="spinner-border spinner-border-sm ms-2 d-none"></span>
+</button>
 
-                    
-                    <div id="result" class="result-box text-center mt-4 p-3 d-none">
-                        <i class="bi bi-translate fs-3 text-primary"></i>
-                        <p class="mt-2 mb-0">
-                            Algılanan Dil:
-                            <strong id="languageResult">Türkçe</strong>
-                        </p>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-    </div>
+<div id="result" class="result-box text-center mt-3 p-3 d-none">
+<i class="bi bi-translate fs-3"></i>
+<p class="mb-0 mt-2">
+<strong id="languageResult"></strong>
+</p>
 </div>
+
+<hr>
+
+<h6 class="text-center text-muted">📝 Algılama Geçmişi</h6>
+<ul id="logList" class="list-group small mt-2"></ul>
+
+</div>
+</div>
+</div>
+</div>
+
+
 <script type="module">
 import {
   LanguageDetector,
@@ -106,7 +92,22 @@ import {
 
 let detector;
 
-async function loadModel() {
+
+const languageMap = {
+  tr: { name: "Türkçe", flag: "🇹🇷" },
+  en: { name: "İngilizce", flag: "🇬🇧" },
+  fr: { name: "Fransızca", flag: "🇫🇷" },
+  de: { name: "Almanca", flag: "🇩🇪" },
+  es: { name: "İspanyolca", flag: "🇪🇸" },
+  it: { name: "İtalyanca", flag: "🇮🇹" },
+  ru: { name: "Rusça", flag: "🇷🇺" },
+  ar: { name: "Arapça", flag: "🇸🇦" },
+  ja: { name: "Japonca", flag: "🇯🇵" },
+  zh: { name: "Çince", flag: "🇨🇳" }
+};
+
+
+(async function loadModel() {
   const fileset = await FilesetResolver.forTextTasks(
     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@0.10.0/wasm"
   );
@@ -118,57 +119,54 @@ async function loadModel() {
     },
     maxResults: 1
   });
-}
-
-loadModel();
+})();
 
 
 window.detectLanguage = async function () {
   const text = document.getElementById("textInput").value.trim();
-  const spinner = document.getElementById("loadingSpinner");
+  const spinner = document.getElementById("spinner");
   const resultBox = document.getElementById("result");
   const resultText = document.getElementById("languageResult");
 
-  if (!text) {
-    alert("Lütfen bir metin gir");
-    return;
-  }
+  if (!text) return alert("Metin giriniz");
 
   spinner.classList.remove("d-none");
   resultBox.classList.add("d-none");
-
 
   const result = await detector.detect(text);
 
   spinner.classList.add("d-none");
 
-
-  console.log("JSON Result:", result);
-
-  if (result.languages.length > 0) {
+  if (result.languages.length) {
     const lang = result.languages[0];
-
-
-    const languageMap = {
-      tr: "Türkçe",
-      en: "İngilizce",
-      fr: "Fransızca",
-      de: "Almanca",
-      es: "İspanyolca",
-      it: "İtalyanca",
-      ru: "Rusça",
-      ja: "Japonca",
-      zh: "Çince",
-      ar: "Arapça"
+    const meta = languageMap[lang.languageCode] || {
+      name: lang.languageCode.toUpperCase(),
+      flag: "🌐"
     };
 
     resultText.innerText =
-      languageMap[lang.languageCode] ??
-      lang.languageCode.toUpperCase();
+      `${meta.flag} ${meta.name} (%${(lang.probability * 100).toFixed(0)})`;
 
     resultBox.classList.remove("d-none");
+    addLog(text, meta, lang.probability);
   }
 };
+
+
+function addLog(text, meta, prob) {
+  const ul = document.getElementById("logList");
+
+  const li = document.createElement("li");
+  li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+  li.innerHTML = `
+    <span>${meta.flag} <strong>${text}</strong>
+    <div class="text-muted small">${meta.name}</div></span>
+    <span class="badge bg-primary">${(prob * 100).toFixed(0)}%</span>
+  `;
+
+  ul.prepend(li);
+}
 </script>
 
 </body>
