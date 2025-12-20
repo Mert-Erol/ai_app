@@ -5,9 +5,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> 
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
         <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> 
-        <!-- Universal Sentencer Encoder modeli --> 
         <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
 
         <style>
@@ -103,7 +101,47 @@
 
             ]);
 
+        
+                    $('#loading').text("Model eğitiliyor...")
+            var embeddings = await encoder.embed(sentences); // Cümleleri vektörlere dönüştürür
+
+            await model.fit(embeddings, labels, {
+                epochs: 20, // 20 tur
+                batchSize: 2, // her seferde 2 örnek
+                shuffle: true, // Her epoch'ta veriyi karıştır
+                callbacks: {
+                    onEpochEnd: (epoch, logs) => { // Her epoch sonunda log mesajı
+                        logMessage(`Epoch ${epoch + 1}: loss=${logs.loss.toFixed(4)}, accuracy=${(logs.acc * 100).toFixed(2)}%`);
+                    }
+            }
+            });
+            $('#loading').text("Model yüklendi ve eğitildi.");
+            logMessage("Model eğitimi tamamlandı.");
         }
+        
+        async function predictText() {
+            var text = $('#inputText').val();
+            if (!text) {
+                alert("Lütfen bir metin girin.");
+                return;
+            }
+            $('#result').text("Tahmin yapılıyor...");
+            var emb = await encoder.embed([text]); // Metni vektöre dönüştür
+            var prediction = model.predict(emb); // Tahmin yap
+            var result = await prediction.arraySync()[0]; // Sonucu diziye dönüştür
+            
+            console.log(result[0], result[1]);
+            var sentiment = result[0] > result[1] ? "Spam değil" : "Spam";
+            $('#result').text(`Duygu: ${sentiment}`);
+        }   
+
+        $(document).ready(function(){
+            LoadAndTrain();
+        });
+
+        $(document).on('click', '#predictBtn', function(){
+            predictText();
+        });
 
     </script>
 
