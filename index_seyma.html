@@ -131,8 +131,8 @@
             var result = await prediction.arraySync()[0]; // Sonucu diziye dönüştür
             
             console.log(result[0], result[1]);
-            var durum = result[0] > result[1] ? "Spam değil" : "Spam";
-            $('#result').text(`Mailiniz: ${durum}`);
+            var durum = result[0] > result[1] ? "spam değil" : "spam";
+            $('#result').text(`Mailiniz ${durum}`);
         }   
 
         $(document).ready(function(){
