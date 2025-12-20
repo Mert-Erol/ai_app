@@ -1,51 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TensorFlow Analiz</title>
+    <title>TensorFlow Duygu Analizi</title>
 
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
     />
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder@latest"></script>
+
+    <style>
+      body {
+        background-color: #f0f2f5;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+      }
+      .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      }
+      .btn-primary {
+        background-color: #4f46e5;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 600;
+      }
+      .btn-primary:hover {
+        background-color: #4338ca;
+      }
+      textarea {
+        border: 2px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        resize: none;
+      }
+      textarea:focus {
+        box-shadow: none !important;
+        border-color: #4f46e5 !important;
+      }
+      #result {
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+      .res-box {
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: bold;
+        text-align: center;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
-      <h2>TensorFlow ile Duygu Analizi</h2>
-      <div class="form-group">
-        <label for="inputText">Cümle Girin:</label>
-        <textarea
-          class="form-control"
-          id="inputText"
-          rows="3"
-          placeholder="Örnek: Bu harika bir gün!"
-        ></textarea>
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="card p-4">
+            <h3 class="text-center mb-4 fw-bold">Duygu Analizi</h3>
+
+            <div class="mb-3">
+              <label class="form-label text-secondary small fw-bold"
+                >CÜMLE GİRİN</label
+              >
+              <textarea
+                class="form-control"
+                id="inputText"
+                rows="4"
+                placeholder="Bir cümle yazın..."
+              ></textarea>
+            </div>
+
+            <div class="d-grid">
+              <button id="predictBtn" class="btn btn-primary" disabled>
+                <span id="btnText">Model Yükleniyor...</span>
+              </button>
+            </div>
+
+            <div id="result" class="mt-4"></div>
+          </div>
+        </div>
       </div>
-      <button id="predictBtn" class="btn btn-primary" disabled>
-        Model Yükleniyor...
-      </button>
-      <div id="result" style="margin-top: 20px"></div>
     </div>
 
     <script>
       let encoder;
       const btn = document.getElementById("predictBtn");
+      const btnText = document.getElementById("btnText");
       const resultDiv = document.getElementById("result");
 
       async function loadModel() {
-        console.log("Model yükleniyor...");
         try {
           encoder = await use.load();
-          console.log("Model başarıyla yüklendi.");
           btn.disabled = false;
-          btn.innerText = "Analiz Et";
+          btnText.innerText = "Analiz Et";
         } catch (error) {
-          console.error("Yükleme hatası:", error);
-          resultDiv.innerHTML = "<p>Model yüklenirken hata oluştu.</p>";
+          resultDiv.innerHTML =
+            '<div class="alert alert-danger">Model yüklenemedi.</div>';
         }
       }
 
@@ -54,7 +109,7 @@
         if (!text.trim()) return;
 
         btn.disabled = true;
-        btn.innerText = "Analiz ediliyor...";
+        btnText.innerText = "Analiz ediliyor...";
 
         const embeddings = await encoder.embed([text]);
         const values = await embeddings.data();
@@ -64,11 +119,19 @@
           sum += values[i];
         }
 
-        let sentiment = sum > 0 ? "Pozitif 😊" : "Negatif 😔";
-        resultDiv.innerHTML = "<h4>Sonuç: " + sentiment + "</h4>";
+        const isPositive = sum > 0;
+        const color = isPositive ? "#d4edda" : "#f8d7da";
+        const textColor = isPositive ? "#155724" : "#721c24";
+        let emoji = isPositive ? "Pozitif 😊" : "Negatif 😔";
+
+        resultDiv.innerHTML = `
+          <div class="res-box" style="background-color: ${color}; color: ${textColor};">
+            ${emoji}
+          </div>
+        `;
 
         btn.disabled = false;
-        btn.innerText = "Analiz Et";
+        btnText.innerText = "Analiz Et";
       }
 
       btn.addEventListener("click", predict);
