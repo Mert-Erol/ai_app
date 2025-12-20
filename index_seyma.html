@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0"> </script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"> </script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
 
 
   </head>
@@ -22,7 +22,7 @@
     }
 
     .card {
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
       background: rgb(61, 57, 61);
       padding: 25px;
@@ -61,7 +61,7 @@
   <body class="arkaplan">
     <div class="container mt-5">
       <div class="card custom-card">
-        <h3 class="text-center mb-3">TensorFlow.js ile Görüntü İşleme</h3>
+        <h3 class="text-center mb-3">TensorFlow.js ile Arka Plan Kaldırma</h3>
 
         <input
           type="file"
@@ -76,7 +76,7 @@
           Model yükleniyor, lütfen bekleyin...
         </div>
 
-        <button id="predictBtn" class="btn custom-btn w-100">Analiz Et</button>
+        <button id="predictBtn" class="btn custom-btn w-100">Arka Planı Kaldır</button>
 
 
         <div id="result" class="text-center mt-3 fw-bold"></div>
@@ -97,7 +97,7 @@
     var model;
     $(document).ready(async function() {
             $('#loading').text('Model yükleniyor, lütfen bekleyin...');
-            model = await mobilenet.load();
+            model = await bodyPix.load();
             $('#loading').text('Model yüklendi. Lütfen bir görsel seçin.');
         });
   </script>
