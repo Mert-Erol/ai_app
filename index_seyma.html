@@ -1,17 +1,110 @@
 <html>
-    <head>
+   <head>
+        <title>Spam Mesaj Tespiti</title>
 
-    </head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> 
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script> 
+        <!-- Universal Sentencer Encoder modeli --> 
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder"></script>
+
+        <style>
+            body {background: #f5f7fa; font-family: Arial, sans-serif; padding: 20px;}
+            .card {box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 15px;}
+            .btn-custom {background-color: #007bff; color: white;}
+            .btn-custom:hover {background-color: #0056b3; color: white; transition: 0.5s;}
+            #result {font-size: 1.2em; margin-top: 15px;}
+       </style>
     <body>
-        <div>
-            <h2>Form</h2>
-            <form>
-                <input type="text" placeholder="Ad Soyad" required>
-                <input type="email" placeholder="E-posta" required>
-                <input type="password" placeholder="Şifre" required>
-                <button type="submit">Gönder</button>   
-            </form>
-        </div>
+        
+        <div class="container">
+            <div class="card p-4 mx-auto" style="max-width: 600px;">
+                <h3 class="text-center mb-3">Tensorflow.js ile duygu analizi</h3>
+                <p class="text-muted text-center">Duygu Analizi</p>
+            
+            <div class="mb-3">
+                <label for="inputText" class="form-label"></label>
+                <textarea class="form-control" id="inputText" rows="3" placeholder="Örnek Cümleler"></textarea>
+            </div>
+
+            <div class="d-grid">
+                <button id="predictBtn" class="btn btn-custom">Analiz et</button>
+            
+            <div id ="loading" class="text-center mt-3 text-secondary">Model yükleniyor, lütfen bekleyin...</div>
+            <hr>
+
+            <div>
+                <h6>Sonuç</h6>
+                <div id="result" class="text-center fw-bold mt-3"></div>
+            </div>
     </body>
+    <script>
+        
+        var model;
+        var encoder;
+
+        function logMessage(msg){
+            $('#log').append(`<div>${msg}</div>`);
+        }
+
+        async function LoadAndTrain() {
+            logMessage('Universal Sentence encoder yükleniyor...');
+            encoder = await use.load();
+            logMessage('USE modeli yüklendi.');
+        
+            // Yeni bir sinir ağı. Transfer learning ile kullanılacak
+            model = tf.sequential(); // Katmanlı model oluşur
+            model.add(tf.layers.dense({inputShape: [512], units: 16, activation: 'relu'})); // 512 boyutlu girdi, 16 nöronlu gizli katman
+            model.add(tf.layers.dropout({rate: 0.2})); // Aşırı öğrenmeyi önler
+            model.add(tf.layers.dense({units: 2, activation: 'softmax'})); // 2 sınıflı çıktı katmanı (pozitif/negatif)
+        
+            model.compile({
+                optimizer: tf.train.adam(0.001), // adam optimizasyon algoritması
+                loss: "categoricalCrossentropy", // Çok sınıflı kayıp fonksiyonu
+                metrics: ["accuracy"] // Doğruluk metriği
+            })
+
+            var sentences = [
+                  
+                // Spam mesajlar
+            "Ücretsiz hediye kazandınız hemen tıklayın",
+            "Tebrikler büyük ödül sizi bekliyor",
+            "Evden para kazanmak ister misiniz",
+            "Bu linke tıklayarak ödülünü al",
+            "Sadece bugün geçerli kampanya kaçırma",
+            "Bedava internet kazanın hemen başvur",
+
+            // Spam olmayan mesajlar
+            "Toplantı yarın saat 14:00'te",
+            "Raporu bugün gönderebilir misin",
+            "Akşam kahve içmeye gidelim mi",
+            "Projeyi yarın teslim edeceğiz",
+            "Beni aradığını gördüm geri döneceğim",
+            "Yardımın için teşekkür ederim"
+
+            ];
+            
+            var labels = tf.tensor2d([
+                  [0, 1], 
+                    [0, 1], 
+                    [0, 1],
+                    [0, 1], 
+                    [0, 1], 
+                    [0, 1], 
+
+                    [1, 0], 
+                    [1, 0], 
+                    [1, 0], 
+                    [1, 0], 
+                    [1, 0], 
+                    [1, 0]  
+
+            ]);
+
+        }
+
+    </script>
 
 </html>
