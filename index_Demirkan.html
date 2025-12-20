@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -67,13 +68,13 @@
                         Metni gir, dilini saniyeler içinde öğren
                     </p>
 
-                    <!-- Textarea -->
+               
                     <div class="mb-3">
                         <textarea id="textInput" class="form-control form-control-lg"
                                   rows="4" placeholder="Örnek: Hello, how are you?"></textarea>
                     </div>
 
-                    <!-- Button -->
+                  
                     <button id="detectBtn" class="btn btn-detect text-white w-100 py-2"
                             onclick="detectLanguage()">
                         Algıla
@@ -82,7 +83,7 @@
                         </span>
                     </button>
 
-                    <!-- Result -->
+                    
                     <div id="result" class="result-box text-center mt-4 p-3 d-none">
                         <i class="bi bi-translate fs-3 text-primary"></i>
                         <p class="mt-2 mb-0">
@@ -97,5 +98,78 @@
         </div>
     </div>
 </div>
+<script type="module">
+import {
+  LanguageDetector,
+  FilesetResolver
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@0.10.0";
+
+let detector;
+
+async function loadModel() {
+  const fileset = await FilesetResolver.forTextTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-text@0.10.0/wasm"
+  );
+
+  detector = await LanguageDetector.createFromOptions(fileset, {
+    baseOptions: {
+      modelAssetPath:
+        "https://storage.googleapis.com/mediapipe-models/language_detector/language_detector/float32/1/language_detector.tflite"
+    },
+    maxResults: 1
+  });
+}
+
+loadModel();
+
+
+window.detectLanguage = async function () {
+  const text = document.getElementById("textInput").value.trim();
+  const spinner = document.getElementById("loadingSpinner");
+  const resultBox = document.getElementById("result");
+  const resultText = document.getElementById("languageResult");
+
+  if (!text) {
+    alert("Lütfen bir metin gir");
+    return;
+  }
+
+  spinner.classList.remove("d-none");
+  resultBox.classList.add("d-none");
+
+
+  const result = await detector.detect(text);
+
+  spinner.classList.add("d-none");
+
+
+  console.log("JSON Result:", result);
+
+  if (result.languages.length > 0) {
+    const lang = result.languages[0];
+
+
+    const languageMap = {
+      tr: "Türkçe",
+      en: "İngilizce",
+      fr: "Fransızca",
+      de: "Almanca",
+      es: "İspanyolca",
+      it: "İtalyanca",
+      ru: "Rusça",
+      ja: "Japonca",
+      zh: "Çince",
+      ar: "Arapça"
+    };
+
+    resultText.innerText =
+      languageMap[lang.languageCode] ??
+      lang.languageCode.toUpperCase();
+
+    resultBox.classList.remove("d-none");
+  }
+};
+</script>
+
 </body>
 </html>
