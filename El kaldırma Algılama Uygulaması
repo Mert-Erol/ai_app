@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>El Kaldırma Algılama - TensorFlow.js</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #020617;
+      color: #e5e7eb;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .app {
+      width: 420px;
+      background: #0f172a;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #38bdf8;
+    }
+
+    p {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    video {
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 10px;
+      background: black;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #22c55e;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <h1>El Kaldırma Algılama</h1>
+    <p>TensorFlow.js + Pose Detection<br>Gerçek zamanlı demo</p>
+
+    <video id="video" autoplay playsinline></video>
+
+    <div class="status" id="status">
+      Kamera bekleniyor...
+    </div>
+  </div>
+
+  <!-- TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
+
+  <script>
+    const video = document.getElementById("video");
+    const statusText = document.getElementById("status");
+    let detector;
+
+    // Kamera aç
+    async function startCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" }
+      });
+      video.srcObject = stream;
+
+      return new Promise(resolve => {
+        video.onloadedmetadata = () => resolve();
+      });
+    }
+
+    // Model yükle
+    async function loadModel() {
+      await tf.setBackend("webgl");
+
+      detector = await poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        {
+          modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING
+        }
+      );
+
+      statusText.textContent = "Model yüklendi, hareket algılanıyor 👀";
+    }
+
+    // El kaldırma kontrolü
+    function detectHand(keypoints) {
+      const lw = keypoints.find(p => p.name === "left_wrist");
+      const ls = keypoints.find(p => p.name === "left_shoulder");
+      const rw = keypoints.find(p => p.name === "right_wrist");
+      const rs = keypoints.find(p => p.name === "right_shoulder");
+
+      if (lw && ls && lw.score > 0.4 && ls.score > 0.4 && lw.y < ls.y) {
+        return "Sol el kaldırıldı ";
+      }
+
+      if (rw && rs && rw.score > 0.4 && rs.score > 0.4 && rw.y < rs.y) {
+        return "Sağ el kaldırıldı ";
+      }
+
+      return "El kaldırılmadı";
+    }
+
+    // Sürekli algılama
+    async function detectLoop() {
+      const poses = await detector.estimatePoses(video);
+
+      if (poses.length > 0) {
+        statusText.textContent = detectHand(poses[0].keypoints);
+      }
+
+      requestAnimationFrame(detectLoop);
+    }
+
+    // Başlat
+    async function init() {
+      try {
+        await startCamera();
+        await loadModel();
+        detectLoop();
+      } catch (err) {
+        statusText.textContent = "Kamera izni verilmedi ❌";
+        console.error(err);
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
