@@ -65,8 +65,14 @@
               </div>
               <div class="d-grid shadow-sm">
                 <button class="btn btn-dark btn-sm" id="fetchLogs">
-                  Eski Logları Getir (LocalStorage)
+                  Eski Logları Import Et
                 </button>
+                <input
+                  type="file"
+                  id="logFileImport"
+                  style="display: none"
+                  accept=".txt"
+                />
                 <button class="btn btn-dark btn-sm mt-2" id="clearLogs">
                   Logları Temizle
                 </button>
@@ -164,6 +170,150 @@
             reader.readAsDataURL(file);
           }
         });
+      });
+      var model;
+      $(document).ready(function () {
+        cocoSsd
+          .load()
+          .then((loadedModel) => {
+            model = loadedModel;
+            $("#logConsole").append("<br> > Model başarıyla yüklendi.");
+            $("#status-area")
+              .removeClass("alert-info")
+              .addClass("alert-success")
+              .text("Model yüklendi. Bir fotoğraf seçebilirsiniz.");
+            $("#image-upload").prop("disabled", false);
+          })
+          .catch((error) => {
+            $("#status-area")
+              .removeClass("alert-info")
+              .addClass("alert-danger")
+              .text("Model yüklenirken hata oluştu. Lütfen sayfayı yenileyin.");
+          });
+      });
+      $("#predictBtn").on("click", function () {
+        const imgElement = document.getElementById("previewImage");
+        const canvas = document.getElementById("outputCanvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = imgElement.naturalWidth;
+        canvas.height = imgElement.naturalHeight;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        $("#logConsole").append("<br> > Nesne tespiti başlatıldı...");
+        model.detect(imgElement).then((predictions) => {
+          if (predictions.length === 0) {
+            $("#logConsole").append("<br> > Nesne bulunamadı.");
+          } else {
+            $("#logConsole").append(
+              "<br> > " + predictions.length + " nesne tespit edildi."
+            );
+          }
+          predictions.forEach((prediction) => {
+            const [x, y, width, height] = prediction["bbox"];
+            ctx.strokeStyle = "#00FFFF";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x, y, width, height);
+            ctx.font = "18px Arial";
+            ctx.fillStyle = "#00FFFF";
+            ctx.fillText(
+              `${prediction["class"]} - %${(prediction["score"] * 100).toFixed(
+                2
+              )}`,
+              x,
+              y > 20 ? y - 5 : y + 20
+            );
+            $("#logConsole").append(
+              `<br> > Tespit: ${prediction["class"]} - Güven: %${(
+                prediction["score"] * 100
+              ).toFixed(2)}`
+            );
+          });
+        });
+        $("#logConsole").append("<br> > Nesne tespiti tamamlandı.");
+      });
+      $("#clearBtn").on("click", function () {
+        $("#previewImage").attr("src", "#").addClass("d-none");
+        $("#placeholderText").removeClass("d-none");
+        $("#predictBtn").prop("disabled", true);
+        $("#outputCanvas").remove();
+        $("#logConsole").append(
+          "<br> > Görsel Temizlendi. Loglar için alt kısmı kullanın."
+        );
+      });
+      $("#clearLogs").on("click", function () {
+        $("#logConsole").html("> Loglar temizlendi.");
+      });
+      $("#saveLogs").on("click", function () {
+        const logEntries = $("#logConsole")
+          .html()
+          .replace(/&gt;/g, ">")
+          .split(/<br>|<div>/i);
+
+        const now = new Date();
+        const timestamp =
+          now.toLocaleDateString("tr-TR") +
+          " " +
+          now.toLocaleTimeString("tr-TR");
+
+        let formattedLogs = "";
+
+        logEntries.forEach((line) => {
+          let cleanLine = line.replace(/<\/?[^>]+(>|$)/g, "").trim();
+          if (cleanLine.length > 0) {
+            if (!cleanLine.startsWith("[")) {
+              formattedLogs += `[${timestamp}] ${cleanLine}\n`;
+            } else {
+              formattedLogs += `${cleanLine}\n`;
+            }
+          }
+        });
+
+        const blob = new Blob([formattedLogs], {
+          type: "text/plain;charset=utf-8",
+        });
+        const link = document.createElement("a");
+
+        link.href = URL.createObjectURL(blob);
+        link.download = "mozkan_logs.txt";
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        $("#logConsole").append(
+          `<br> > [${timestamp}] Loglar mozkan_logs.txt olarak kaydedildi.`
+        );
+      });
+      $("#fetchLogs").on("click", function () {
+        $("#logFileImport").click();
+      });
+
+      $("#logFileImport").on("change", function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (f) {
+            const content = f.target.result;
+            const lines = content.split("\n");
+
+            $("#logConsole").empty();
+
+            lines.forEach((line) => {
+              if (line.trim().length > 0) {
+                $("#logConsole").append(`<div>${line}</div>`);
+              }
+            });
+
+            const now = new Date();
+            const timestamp =
+              now.toLocaleDateString("tr-TR") +
+              " " +
+              now.toLocaleTimeString("tr-TR");
+            $("#logConsole").append(
+              `<br> > [${timestamp}] Log dosyası başarıyla import edildi.`
+            );
+          };
+          reader.readAsText(file);
+        }
       });
     </script>
   </body>
