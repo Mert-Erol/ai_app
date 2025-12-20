@@ -1,2 +1,2 @@
 # ai_app
-Example project from scracth with AI functionalities
+Example project from scratch with AI functionalities
