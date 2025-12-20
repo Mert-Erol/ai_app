@@ -9,21 +9,26 @@
     <style>
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #749BC2, #4682A9);
+            background-image: url(background.jpg);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .card {
-            border-radius: 18px;
+            border-radius: 8px;
             border: none;
+        }
+        .card:hover {
+            border-radius: 18px;
+            transform: translateY(-1px);
+            box-shadow: 0 50px 50px rgba(15, 216, 163, 0.15);
+            transition: 0.5s;
         }
 
         .card-title {
             font-weight: 600;
         }
-
         textarea {
             resize: none;
         }
