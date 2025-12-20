@@ -87,55 +87,6 @@
       </div>
     </div>
 
-    <script>
-      let encoder;
-      const btn = document.getElementById("predictBtn");
-      const btnText = document.getElementById("btnText");
-      const resultDiv = document.getElementById("result");
-
-      async function loadModel() {
-        try {
-          encoder = await use.load();
-          btn.disabled = false;
-          btnText.innerText = "Analiz Et";
-        } catch (error) {
-          resultDiv.innerHTML =
-            '<div class="alert alert-danger">Model yüklenemedi.</div>';
-        }
-      }
-
-      async function predict() {
-        const text = document.getElementById("inputText").value;
-        if (!text.trim()) return;
-
-        btn.disabled = true;
-        btnText.innerText = "Analiz ediliyor...";
-
-        const embeddings = await encoder.embed([text]);
-        const values = await embeddings.data();
-
-        let sum = 0;
-        for (let i = 0; i < values.length; i++) {
-          sum += values[i];
-        }
-
-        const isPositive = sum > 0;
-        const color = isPositive ? "#d4edda" : "#f8d7da";
-        const textColor = isPositive ? "#155724" : "#721c24";
-        let emoji = isPositive ? "Pozitif 😊" : "Negatif 😔";
-
-        resultDiv.innerHTML = `
-          <div class="res-box" style="background-color: ${color}; color: ${textColor};">
-            ${emoji}
-          </div>
-        `;
-
-        btn.disabled = false;
-        btnText.innerText = "Analiz Et";
-      }
-
-      btn.addEventListener("click", predict);
-      window.onload = loadModel;
-    </script>
+    <script></script>
   </body>
 </html>
