@@ -92,28 +92,5 @@
         </div>
     </div>
 </div>
-
-<script>
-    function detectLanguage() {
-        const text = document.getElementById("textInput").value;
-        const spinner = document.getElementById("loadingSpinner");
-        const result = document.getElementById("result");
-
-        if (!text.trim()) {
-            alert("Lütfen metin giriniz.");
-            return;
-        }
-
-        spinner.classList.remove("d-none");
-        result.classList.add("d-none");
-
-        setTimeout(() => {
-            spinner.classList.add("d-none");
-            document.getElementById("languageResult").innerText = "Türkçe";
-            result.classList.remove("d-none");
-        }, 1500);
-    }
-</script>
-
 </body>
 </html>
