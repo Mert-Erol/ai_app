@@ -1,100 +1,92 @@
 <html>
-   <head>
-        <title>Ai proje</title>
+  <head>
+    <title>Ai proje</title>
 
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> 
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </head>
+  <style>
+    .arkaplan {
+      background: #b4aab6;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+
+    .card {
+      max-width: 500px;
+      margin: auto;
+      background: rgb(61, 57, 61);
+      padding: 25px;
+      border-radius: 12px;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .gorsel {
+      margin-top: 15px;
+      border-radius: 8px;
+    }
+
+    .btn {
+      margin-top: 15px;
+      padding: 10px;
+      background: #ccc3d0;
+      color: rgb(0, 0, 0);
+      border: none;
+      border-radius: 6px;
+    }
+
+    .btn:hover {
+      background: #89739d;
+    }
+
+    #loading {
+      color: #d8d8d8;
+      font-size: 1em;
+    }
+
+    #result {
+      font-size: 1.1em;
+    }
+  </style>
+  <body class="arkaplan">
+    <div class="container mt-5">
+      <div class="card custom-card">
+        <h3 class="text-center mb-3">TensorFlow.js ile Görüntü İşleme</h3>
+
+        <input
+          type="file"
+          id="imageUpload"
+          class="form-control mb-3"
+          accept="image/*"
+        />
+
+        <img id="preview" class="img-fluid preview-img d-none" />
         
+        <div id="loading" class="text-center mt-2">
+          Model yükleniyor, lütfen bekleyin...
+        </div>
 
-        <style>
-.arkaplan {
-  background: #b4aab6;
-  font-family: Arial, sans-serif;
-  padding: 40px;
-}
+        <button id="predictBtn" class="btn custom-btn w-100">Analiz Et</button>
 
 
-.card {
-  max-width: 500px;
-  margin: auto;
-  background: rgb(61, 57, 61);
-  padding: 25px;
-  border-radius: 12px;
-  color: white;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.gorsel {
-  margin-top: 15px;
-  border-radius: 8px;
-}
-
-.btn {
-  margin-top: 15px;
-  padding: 10px;
-  background: #ccc3d0;
-  color: rgb(0, 0, 0);
-  border: none;
-  border-radius: 6px;
-}
-
-.btn:hover {
-  background: #cca9ea;
-}
-
-#loading {
-  color: #777;
-  font-size: 0.9em;
-}
-
-#result {
-  font-size: 1.1em;
-}
-
-    </style>
-    <body class="arkaplan">
-        
-        <div class="container mt-5">
-    <div class="card custom-card">
-
-      <h3 class="text-center mb-3">
-        TensorFlow.js ile Görüntü İşleme
-      </h3>
-
-      <input type="file" id="imageUpload"
-             class="form-control mb-3"
-             accept="image/*">
-
-      <img id="preview" class="img-fluid preview-img d-none">
-
-      <button id="predictBtn" class="btn custom-btn w-100">
-        Analiz Et
-      </button>
-
-      <div id="loading" class="text-center mt-2">
-        Model yükleniyor, lütfen bekleyin...
+        <div id="result" class="text-center mt-3 fw-bold"></div>
       </div>
-
-      <div id="result" class="text-center mt-3 fw-bold"></div>
-
     </div>
-  </div>
-        
-    </body>
+  </body>
 
+  <script>
+    $("#imageUpload").on("change", function () {
+      const file = this.files[0];
+      if (!file) return;
 
-<script>
-$("#imageUpload").on("change", function () {
-  const file = this.files[0];
-  if (!file) return;
-
-  $("#preview")
-    .attr("src", URL.createObjectURL(file))
-    .removeClass("d-none");
-});
-</script>
-
-   
-
+      $("#preview")
+        .attr("src", URL.createObjectURL(file))
+        .removeClass("d-none");
+    });
+  </script>
 </html>
