@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>API DUYGU ANALİZİ</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="container py-5 bg-light">
+    <div class="card shadow-sm mx-auto" style="max-width: 600px">
+      <div class="card-body text-center">
+        <h3 class="mb-4">Duygu Analizi - API</h3>
+        <input
+          type="text"
+          id="userInput"
+          class="form-control mb-3"
+          placeholder="Analiz edilecek metni yazın..."
+        />
+        <button id="sendBtn" class="btn btn-danger w-100 mb-3">
+          Analiz Et
+        </button>
+
+        <div id="resultArea" style="display: none" class="border-top pt-3">
+          <div class="display-6 my-2" id="resEmoji"></div>
+          <p class="h4"><span id="resDuygu" class="badge"></span></p>
+
+          <div class="mt-4">
+            <h6 class="text-start text-muted text-center">
+              API Cevabı (Ham Veri):
+            </h6>
+            <pre id="rawLog"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#sendBtn").click(function () {
+          const metinVal = $("#userInput").val();
+          if (!metinVal) return;
+
+          $.ajax({
+            url: "/analiz",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ metin: metinVal }),
+            success: function (data) {
+              $("#resultArea").fadeIn();
+              $("#resDuygu").text(data.durum);
+              $("#resSkor").text(data.skor);
+
+              const formattedJson = JSON.stringify(data, null, 4);
+              $("#rawLog").text(formattedJson);
+
+              if (data.durum === "Pozitif") {
+                $("#resDuygu").attr("class", "badge bg-success");
+              } else if (data.durum === "Negatif") {
+                $("#resDuygu").attr("class", "badge bg-danger");
+              } else {
+                $("#resDuygu").attr("class", "badge bg-secondary");
+              }
+            },
+            error: function () {
+              alert("Veri alınırken hata oluştu.");
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
