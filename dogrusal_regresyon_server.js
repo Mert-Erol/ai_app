@@ -1,3 +1,9 @@
+// --- Node 14 icin Uyumluluk Yamasi ---
+if (!Object.hasOwn) {
+    Object.hasOwn = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
+}
+// -------------------------------------
+
 const express = require('express');
 const tf = require('@tensorflow/tfjs');
 
