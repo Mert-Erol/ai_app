@@ -11,6 +11,8 @@
     <style>
       .preview-box {
         min-height: 200px;
+        max-height: 400px;
+        overflow: hidden;
         border: 2px dashed #dee2e6;
         display: flex;
         align-items: center;
@@ -23,6 +25,13 @@
         padding: 15px;
         margin-top: 15px;
       }
+      .preview-box img {
+    max-width: 100%;
+    max-height: 380px; 
+    object-fit: contain; 
+    border-radius: 5px;
+    
+}
     </style>
   </head>
   <body class="bg-light">
@@ -30,7 +39,7 @@
       <div class="row g-4">
         <div class="col-md-4">
           <div class="card shadow-sm border-0 h-100">
-            <div class="card-body mt-5">
+            <div class="card-body ">
               <h3 class="card-title mb-4 mt-5 text-center">Görsel Yükle</h5>
               <div class="mb-3 mt-5">
                 <label for="imageInput" class="form-label text-muted small"
@@ -41,6 +50,17 @@
               <button class="btn btn-primary w-100 mt-2 py-2">
                 Analizi Başlat
               </button>
+              <div id="logArea" class="mt-4">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3 text-center">
+                  İşlemler
+                </h6>
+                <div
+                  class="result-box text-muted small fw-bold mb-3 text-center"
+                  style="height: 150px; overflow-y: none;"
+                >
+                
+            </div>
+              </div>
             </div>
           </div>
         </div>
@@ -82,5 +102,80 @@
       </div>
     </div>
   </body>
-  
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="module">
+    import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.0";
+
+    var sentimentAnalyzer;
+    var selectedFile = null;
+
+    async function loadModel() {
+        $("#logArea .result-box").append("<p> > Model yükleniyor...</p>");
+        try {
+            sentimentAnalyzer = await pipeline('sentiment-analysis', 'Xenova/distilbert-base-uncased-finetuned-sst-2-english');
+            $("#logArea .result-box").append("<p> > Model hazır!</p>");
+        } catch (error) {
+            $("#logArea .result-box").append("<p> > Model yükleme hatası!</p>");
+        }
+    }
+
+    $('#imageInput').on('change', function(e) {
+        selectedFile = e.target.files[0];
+        if (selectedFile) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                $('.preview-box img').attr('src', event.target.result).show();
+            };
+            reader.readAsDataURL(selectedFile);
+            $("#logArea .result-box").append("<p> > Resim yüklendi!</p>");
+        }
+    });
+
+    $('.btn-primary').on('click', async function() {
+        if (!selectedFile) return alert("Lütfen bir resim seçin!");
+
+        const btn = $(this);
+        btn.html('<span class="spinner-border spinner-border-sm"></span> İşleniyor...').prop('disabled', true);
+        $("#logArea .result-box").append("<p> > Analiz başlatılıyor...</p>");
+
+        try {
+            const ocrResult = await Tesseract.recognize(selectedFile, 'eng');
+            const text = ocrResult.data.text.trim();
+            $('#resultText').text(text || "Metin bulunamadı.");
+
+            if (text && sentimentAnalyzer) {
+                const analysis = await sentimentAnalyzer(text);
+                showSentimentResult(analysis[0]);
+                $("#logArea .result-box").append("<p> > Analiz tamamlandı.</p>");
+            }
+        } catch (error) {
+            $("#logArea .result-box").append("<p> > Hata: " + error.message + "</p>");
+        } finally {
+            btn.html('Analizi Başlat').prop('disabled', false);
+            const box = $("#logArea .result-box");
+            box.scrollTop(box[0].scrollHeight);
+        }
+    });
+
+    function showSentimentResult(data) {
+        const scorePercent = (data.score * 100).toFixed(1) + "%";
+        
+        $('.display-6').empty();
+        $('.fw-bold').last().text("");
+        $('.text-muted').last().text("");
+
+        if (data.label === "POSITIVE" || data.label === "5 stars" || data.label === "4 stars") {
+            $('.display-6').text("😊");
+            $('.result-section.border-success .fw-bold').text("Pozitif").removeClass('text-danger text-warning').addClass('text-success');
+            $('.text-muted').last().text("Skor: " + scorePercent);
+        } else {
+            $('.display-6').text("😞");
+            $('.result-section.border-success .fw-bold').text("Negatif").removeClass('text-success text-warning').addClass('text-danger');
+            $('.text-muted').last().text("Skor: " + scorePercent);
+        }
+    }
+
+    loadModel();
+</script>
 </html>
