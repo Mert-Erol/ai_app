@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Tahmin Uygulaması</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 50px; text-align: center; }
+        input { padding: 10px; font-size: 16px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background-color: #28a745; color: white; border: none; }
+        #sonuc { font-size: 24px; color: blue; margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Yapay Zeka Tahmin Ekranı</h1>
+    <p>Model Formülü: <b>Y = 2X - 1</b></p>
+    
+    <input type="number" id="sayiGiris" placeholder="Bir sayı girin (Örn: 10)">
+    <button id="btnHesapla">Tahmin Et</button>
+
+    <div id="sonuc">Sonuç burada görünecek...</div>
+
+    <script>
+        $(document).ready(function() {
+            
+            // Butona tıklanınca çalışacak fonksiyon
+            $("#btnHesapla").click(function() {
+                
+                // 1. Kutudaki sayıyı al
+                var girilenSayi = $("#sayiGiris").val();
+
+                // 2. Sunucuya AJAX isteği at
+                $.ajax({
+                    url: "http://localhost:3000/predict?val=" + girilenSayi,
+                    type: "GET",
+                    success: function(veri) {
+                        // 3. Gelen cevabı ekrana yaz
+                        $("#sonuc").text("AI Tahmini: " + veri.tahmin.toFixed(2));
+                    },
+                    error: function() {
+                        $("#sonuc").text("Hata: Sunucu çalışmıyor olabilir!");
+                    }
+                });
+
+            });
+
+        });
+    </script>
+
+</body>
+</html>
