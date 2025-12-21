@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nesne Tanıma Projesi</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@1.0.0"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        body {
+            text-align: center;
+            font-family: sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        img {
+            margin-top: 20px;
+            border: 5px solid #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 18px;
+            background-color: #e74c3c; 
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        li {
+            font-size: 18px;
+            background: white;
+            margin: 5px auto;
+            width: 300px;
+            padding: 10px;
+            border-bottom: 2px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Yapay Zeka - Nesne Tanıma</h1>
+
+    <p>Lütfen bir resim seçin:</p>
+    <input type="file" id="fileInput">
+    <br>
+    
+    <img id="imageElement" src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?w=300" width="300" crossorigin="anonymous">
+    <br>
+
+    <button id="btnPredict">Analiz Et</button>
+
+    <ul id="resultList"></ul>
+
+    <script>
+     
+        var model;
+
+        $(document).ready(function() {
+            
+            console.log("Model loading...");
+            
+            
+            mobilenet.load().then(function(loadedModel) {
+                model = loadedModel;
+                console.log("Model loaded successfully.");
+                alert("Model yüklendi! Artık analiz yapabilirsiniz.");
+            });
+
+            
+            $("#fileInput").change(function(e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+
+                reader.onload = function(event) {
+                    
+                    $("#imageElement").attr("src", event.target.result);
+                
+                    $("#resultList").empty(); 
+                };
+
+                if (file) {
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            
+            $("#btnPredict").click(async function() {
+                
+                $("#resultList").html("<li>Analiz ediliyor, lütfen bekleyin...</li>");
+
+                
+                var img = document.getElementById('imageElement');
+
+                
+                var predictions = await model.classify(img);
+
+              
+                $("#resultList").empty();
+                
+              
+                predictions.forEach(function(prediction) {
+                    var probability = (prediction.probability * 100).toFixed(1);
+                    
+            
+                    $("#resultList").append(
+                        "<li>" + prediction.className + ": %" + probability + "</li>"
+                    );
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
