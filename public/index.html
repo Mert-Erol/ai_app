@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Demo</title>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+  <h2>Node.js + TensorFlow</h2>
+
+  <input type="number" id="num" placeholder="Sayı gir">
+  <button id="btn">Gönder</button>
+
+  <p id="out"></p>
+
+  <script>
+    $("#btn").click(() => {
+      $.ajax({
+        url: "/predict",
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({ number: $("#num").val() }),
+        success: (res) => {
+          $("#out").text("AI Sonuç: " + res.prediction);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
