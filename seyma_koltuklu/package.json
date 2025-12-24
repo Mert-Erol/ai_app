@@ -1,14 +1,13 @@
 {
   "name": "seyma_koltuklu",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "TensorFlow.js Body Segmentation with Node.js HTTP Server",
+  "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@tensorflow/tfjs": "^4.22.0"
-  }
+  "dependencies": {}
 }

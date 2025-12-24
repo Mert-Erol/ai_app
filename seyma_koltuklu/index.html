@@ -12,8 +12,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix"></script>
 
-
   </head>
+  
   <style>
     .arkaplan {
       background: #b4aab6;
@@ -58,6 +58,7 @@
       font-size: 1.1em;
     }
   </style>
+  
   <body class="arkaplan">
     <div class="container mt-5">
       <div class="card custom-card">
@@ -77,10 +78,7 @@
 
         <button id="blnkBtn" class="btn custom-btn w-100">Arka Planı Bulanıklaştır</button>
         
-
         <canvas id="canvas" class="w-100 mt-3 d-none"></canvas>
-
-
 
         <div id="result" class="text-center mt-3 fw-bold"></div>
       </div>
@@ -99,49 +97,71 @@
 
     var model;
     $(document).ready(async function() {
-            $('#loading').text('Model yükleniyor, lütfen bekleyin...');
-            model = await bodyPix.load();
-            $('#loading').text('Model yüklendi. Lütfen bir görsel seçin.');
-        });
+      $('#loading').text('Model yükleniyor, lütfen bekleyin...');
+      model = await bodyPix.load();
+      $('#loading').text('Model yüklendi. Lütfen bir görsel seçin.');
+    });
     
-  $("#blnkBtn").on("click", async function () {
-  const input = document.getElementById("imageUpload");
-  const file = input.files[0];
+    $("#blnkBtn").on("click", async function () {
+      const input = document.getElementById("imageUpload");
+      const file = input.files[0];
 
-  if (!file) {
-    alert("Lütfen önce bir görsel seçin");
-    return;
-  }
+      if (!file) {
+        alert("Lütfen önce bir görsel seçin");
+        return;
+      }
 
-  if (!model) {
-    alert("Model henüz yüklenmedi");
-    return;
-  }
+      if (!model) {
+        alert("Model henüz yüklenmedi");
+        return;
+      }
 
-  const img = document.getElementById("preview");
+      const img = document.getElementById("preview");
 
-  if (!img.complete) {
-    alert("Görsel henüz yüklenmedi");
-    return;
-  }
+      if (!img.complete) {
+        alert("Görsel henüz yüklenmedi");
+        return;
+      }
 
-  const segmentation = await model.segmentPerson(img);
+      $('#loading').text('Görsel işleniyor...');
 
-  const canvas = document.getElementById("canvas");
-  canvas.width = img.naturalWidth;
-  canvas.height = img.naturalHeight;
-  canvas.classList.remove("d-none");
+      const segmentation = await model.segmentPerson(img);
 
-  bodyPix.drawBokehEffect(
-    canvas,
-    img,
-    segmentation,
-    6,
-    6,
-    false
-  );
-});
-    
+      const canvas = document.getElementById("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.classList.remove("d-none");
 
+      bodyPix.drawBokehEffect(
+        canvas,
+        img,
+        segmentation,
+        6,
+        6,
+        false
+      );
+
+      $('#loading').text('İşlem tamamlandı! Server\'a gönderiliyor...');
+
+      // Canvas'i base64 formatina cevir
+      const canvasData = canvas.toDataURL('image/png');
+      
+      // Server'a gonder
+      $.ajax({
+        url: '/save-image',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          imageData: canvasData,
+          fileName: file.name
+        }),
+        success: function(response) {
+          $('#loading').text('✅ Başarılı! ' + response.message);
+        },
+        error: function() {
+          $('#loading').text('❌ Server\'a gönderilemedi!');
+        }
+      });
+    });
   </script>
 </html>
