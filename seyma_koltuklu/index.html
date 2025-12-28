@@ -156,10 +156,10 @@
           fileName: file.name
         }),
         success: function(response) {
-          $('#loading').text('✅ Başarılı! ' + response.message);
+          $('#loading').text('Başarılı! ' + response.message);
         },
         error: function() {
-          $('#loading').text('❌ Server\'a gönderilemedi!');
+          $('#loading').text('Server\'a gönderilemedi!');
         }
       });
     });
