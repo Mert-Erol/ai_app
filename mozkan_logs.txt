@@ -1,0 +1,27 @@
+[20.12.2025 12:23:18] > Sistem hazır...
+[20.12.2025 12:23:18] > Model başarıyla yüklendi.
+[20.12.2025 12:23:18] > Görsel yüklendi: yol-trafik-planlamasi.jpg
+[20.12.2025 12:23:18] > Analiz için hazır...
+[20.12.2025 12:23:18] > Nesne tespiti başlatıldı...
+[20.12.2025 12:23:18] > Nesne tespiti tamamlandı.
+[20.12.2025 12:23:18] > 20 nesne tespit edildi.
+[20.12.2025 12:23:18] > Tespit: car - Güven: %94.82
+[20.12.2025 12:23:18] > Tespit: car - Güven: %92.19
+[20.12.2025 12:23:18] > Tespit: car - Güven: %89.92
+[20.12.2025 12:23:18] > Tespit: car - Güven: %85.23
+[20.12.2025 12:23:18] > Tespit: car - Güven: %83.86
+[20.12.2025 12:23:18] > Tespit: car - Güven: %83.57
+[20.12.2025 12:23:18] > Tespit: car - Güven: %82.86
+[20.12.2025 12:23:18] > Tespit: car - Güven: %73.45
+[20.12.2025 12:23:18] > Tespit: car - Güven: %67.26
+[20.12.2025 12:23:18] > Tespit: car - Güven: %66.95
+[20.12.2025 12:23:18] > Tespit: car - Güven: %66.88
+[20.12.2025 12:23:18] > Tespit: car - Güven: %65.77
+[20.12.2025 12:23:18] > Tespit: car - Güven: %65.18
+[20.12.2025 12:23:18] > Tespit: car - Güven: %63.89
+[20.12.2025 12:23:18] > Tespit: car - Güven: %60.83
+[20.12.2025 12:23:18] > Tespit: car - Güven: %59.49
+[20.12.2025 12:23:18] > Tespit: car - Güven: %53.43
+[20.12.2025 12:23:18] > Tespit: car - Güven: %52.01
+[20.12.2025 12:23:18] > Tespit: car - Güven: %51.95
+[20.12.2025 12:23:18] > Tespit: car - Güven: %50.44
